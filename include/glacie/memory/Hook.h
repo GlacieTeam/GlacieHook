@@ -94,6 +94,8 @@ struct HookAutoRegister {
 
 } // namespace glacie::memory
 
+#define VA_EXPAND(...) __VA_ARGS__
+
 #define HOOK_IMPL(REGISTER, FUNC_PTR, STATIC, CALL, DEF_TYPE, TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)               \
     struct DEF_TYPE TYPE {                                                                                             \
         using FuncPtr      = ::glacie::memory::FuncPtr;                                                                \
