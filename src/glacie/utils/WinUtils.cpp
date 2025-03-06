@@ -30,7 +30,7 @@ bool isWine() {
     return result;
 }
 
-std::span<uchar> getImageRange(std::string const& name) {
+std::span<uint8_t> getImageRange(std::string const& name) {
     static auto process = GetCurrentProcess();
     HMODULE     rangeStart;
     if (name.empty()) {
@@ -41,7 +41,7 @@ std::span<uchar> getImageRange(std::string const& name) {
     if (rangeStart) {
         MODULEINFO miModInfo;
         if (GetModuleInformation(process, rangeStart, &miModInfo, sizeof(MODULEINFO))) {
-            return {(uchar*)rangeStart, miModInfo.SizeOfImage};
+            return {(uint8_t*)rangeStart, miModInfo.SizeOfImage};
         }
     }
     return {};

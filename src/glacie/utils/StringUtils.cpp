@@ -63,9 +63,9 @@ fmt::text_style getTextStyleFromCode(std::string_view code) {
             }
         } else {
             int num = svtoi(code);
-            if (magic_enum::enum_contains<fmt::terminal_color>((uchar)num)) {
+            if (magic_enum::enum_contains<fmt::terminal_color>((uint8_t)num)) {
                 return fmt::fg((fmt::terminal_color)num);
-            } else if (magic_enum::enum_contains<fmt::terminal_color>((uchar)(num - 10))) {
+            } else if (magic_enum::enum_contains<fmt::terminal_color>((uint8_t)(num - 10))) {
                 return fmt::bg((fmt::terminal_color)(num - 10));
             } else {
                 switch (num) {
@@ -105,7 +105,7 @@ std::string getAnsiCodeFromTextStyle(fmt::text_style style) {
     return fmt::to_string(buf);
 }
 
-std::wstring str2wstr(std::string_view str, uint codePage) {
+std::wstring str2wstr(std::string_view str, uint32_t codePage) {
     int len = MultiByteToWideChar(codePage, 0, str.data(), (int)str.size(), nullptr, 0);
     if (len == 0) { return {}; }
     std::wstring wstr(len, L'\0');
@@ -113,7 +113,7 @@ std::wstring str2wstr(std::string_view str, uint codePage) {
     return wstr;
 }
 
-std::string wstr2str(std::wstring_view str, uint codePage) {
+std::string wstr2str(std::wstring_view str, uint32_t codePage) {
     int len = WideCharToMultiByte(codePage, 0, str.data(), (int)str.size(), nullptr, 0, nullptr, nullptr);
     if (len == 0) { return {}; }
     std::string ret(len, '\0');
@@ -121,7 +121,7 @@ std::string wstr2str(std::wstring_view str, uint codePage) {
     return ret;
 }
 
-std::string str2str(std::string_view str, uint fromCodePage, uint toCodePage) {
+std::string str2str(std::string_view str, uint32_t fromCodePage, uint32_t toCodePage) {
     return wstr2str(str2wstr(str, fromCodePage), toCodePage);
 }
 

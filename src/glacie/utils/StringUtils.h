@@ -4,7 +4,6 @@
 #include <string_view>
 #include <vector>
 
-#include "glacie/base/StdInt.h"
 #include "glacie/memory/Memory.h"
 
 #include "fmt/color.h"
@@ -51,7 +50,7 @@ replaceAll(std::string const& str, std::string_view oldValue, std::string_view n
     return ret;
 }
 
-constexpr inline uchar digitFromByte[] = {
+constexpr inline uint8_t digitFromByte[] = {
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   255, 255, 255, 255, 255, 255, 255, 10,
@@ -67,7 +66,7 @@ constexpr inline uchar digitFromByte[] = {
 };
 static_assert(sizeof(digitFromByte) == 256);
 
-[[nodiscard]] constexpr uchar digitFromChar(char chr) noexcept { return digitFromByte[static_cast<uchar>(chr)]; }
+[[nodiscard]] constexpr uint8_t digitFromChar(char chr) noexcept { return digitFromByte[static_cast<uint8_t>(chr)]; }
 
 /**
  * @brief Integer to hex string.
@@ -107,7 +106,7 @@ intToHexStr(T value, bool upperCase = true, bool no0x = true, bool noLeadingZero
     constexpr char hexStr[2][17] = {"0123456789abcdef", "0123456789ABCDEF"};
     std::string    hex;
     hex.reserve(value.size() * (addSpace ? 3 : 2));
-    for (uchar x : value) {
+    for (uint8_t x : value) {
         hex += hexStr[upperCase][x / 16];
         hex += hexStr[upperCase][x % 16];
         if (addSpace) hex += ' ';
@@ -144,18 +143,18 @@ bool isu8str(std::string_view str) noexcept;
 std::string tou8str(std::string_view str);
 
 namespace CodePage {
-enum : uint {
+enum : uint32_t {
     UTF16 = 0,
     ANSI  = 936,
     UTF8  = 65001,
 };
 } // namespace CodePage
 
-std::wstring str2wstr(std::string_view str, uint codePage = CodePage::UTF8);
+std::wstring str2wstr(std::string_view str, uint32_t codePage = CodePage::UTF8);
 
-std::string wstr2str(std::wstring_view str, uint codePage = CodePage::UTF8);
+std::string wstr2str(std::wstring_view str, uint32_t codePage = CodePage::UTF8);
 
-std::string str2str(std::string_view str, uint fromCodePage = CodePage::ANSI, uint toCodePage = CodePage::UTF8);
+std::string str2str(std::string_view str, uint32_t fromCodePage = CodePage::ANSI, uint32_t toCodePage = CodePage::UTF8);
 
 [[nodiscard]] inline std::string u8str2str(std::u8string str) {
     std::string& tmp = *reinterpret_cast<std::string*>(&str);
@@ -207,35 +206,35 @@ template <class T, auto f>
     return static_cast<T>(ans);
 }
 
-[[nodiscard]] inline schar svtoc(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<schar, strtol>(str, idx, base);
+[[nodiscard]] inline int8_t svtoc(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<int8_t, strtol>(str, idx, base);
 }
-[[nodiscard]] inline uchar svtouc(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<uchar, strtoul>(str, idx, base);
+[[nodiscard]] inline uint8_t svtouc(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<uint8_t, strtoul>(str, idx, base);
 }
 [[nodiscard]] inline short svtos(std::string_view str, size_t* idx = nullptr, int base = 10) {
     return svtonum<short, strtol>(str, idx, base);
 }
-[[nodiscard]] inline ushort svtous(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<ushort, strtoul>(str, idx, base);
+[[nodiscard]] inline uint16_t svtous(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<uint16_t, strtoul>(str, idx, base);
 }
 [[nodiscard]] inline int svtoi(std::string_view str, size_t* idx = nullptr, int base = 10) {
     return svtonum<int, strtol>(str, idx, base);
 }
-[[nodiscard]] inline uint svtoui(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<uint, strtoul>(str, idx, base);
+[[nodiscard]] inline uint32_t svtoui(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<uint32_t, strtoul>(str, idx, base);
 }
 [[nodiscard]] inline long svtol(std::string_view str, size_t* idx = nullptr, int base = 10) {
     return svtonum<long, strtol>(str, idx, base);
 }
-[[nodiscard]] inline ulong svtoul(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<ulong, strtoul>(str, idx, base);
+[[nodiscard]] inline uint64_t svtoul(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<uint64_t, strtoul>(str, idx, base);
 }
-[[nodiscard]] inline int64 svtoll(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<int64, strtoll>(str, idx, base);
+[[nodiscard]] inline int64_t svtoll(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<int64_t, strtoll>(str, idx, base);
 }
-[[nodiscard]] inline uint64 svtoull(std::string_view str, size_t* idx = nullptr, int base = 10) {
-    return svtonum<uint64, strtoull>(str, idx, base);
+[[nodiscard]] inline uint64_t svtoull(std::string_view str, size_t* idx = nullptr, int base = 10) {
+    return svtonum<uint64_t, strtoull>(str, idx, base);
 }
 [[nodiscard]] inline float svtof(std::string_view str, size_t* idx = nullptr) {
     return svtonum<float, strtof>(str, idx);
@@ -243,7 +242,7 @@ template <class T, auto f>
 [[nodiscard]] inline double svtod(std::string_view str, size_t* idx = nullptr) {
     return svtonum<double, strtof>(str, idx);
 }
-[[nodiscard]] inline ldouble svtold(std::string_view str, size_t* idx = nullptr) {
-    return svtonum<ldouble, strtof>(str, idx);
+[[nodiscard]] inline long double svtold(std::string_view str, size_t* idx = nullptr) {
+    return svtonum<long double, strtof>(str, idx);
 }
 } // namespace glacie::utils::string_utils

@@ -11,7 +11,6 @@
 #include <string_view>
 #include <vector>
 
-#include "glacie/base/StdInt.h"
 #include "glacie/utils/StringUtils.h"
 #include "glacie/utils/WinUtils.h"
 #include "libhat/Process.hpp"
