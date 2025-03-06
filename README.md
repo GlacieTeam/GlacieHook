@@ -2,9 +2,10 @@
 Hook library for Glacie
 
 ## Used Projects
-| Project          | License    | Link                                    |
-| ---------------- | ---------- | --------------------------------------- |
-| PreLoader        | LGPLv3     | <https://github.com/LiteLDev/PreLoader> |
+| Project          | License    | Link                                     |
+| ---------------- | ---------- | ---------------------------------------- |
+| PreLoader        | LGPLv3     | <https://github.com/LiteLDev/PreLoader>  |
+| LeviLamina       | LGPLv3     | <https://github.com/LiteLDev/LeviLamina> |
 
 ## License
 - Please note that this project is licensed under the LGPLv3.
