@@ -11,7 +11,6 @@
 #include "libhat/Signature.hpp"
 #include "ll/api/base/FixedString.h"
 #include "ll/api/utils/StringUtils.h"
-#include "ll/api/base/Macro.h"
 
 namespace ll::memory {
 
@@ -60,7 +59,7 @@ inline void memcpy_t(void* dst, void const* src) {
  * @param t Signature
  * @return function pointer
  */
-LLNDAPI FuncPtr resolveSignature(const char* signature);
+FuncPtr resolveSignature(const char* signature);
 
 /**
  * @brief make a region of memory writable and executable, then call the
@@ -69,9 +68,9 @@ LLNDAPI FuncPtr resolveSignature(const char* signature);
  * @param len Length of the region
  * @param callback Callback
  */
-LLAPI void modify(void* ptr, size_t len, const std::function<void()>& callback);
+void modify(void* ptr, size_t len, const std::function<void()>& callback);
 
-LLAPI Handle getModuleHandle(void* addr);
+Handle getModuleHandle(void* addr);
 
 inline Handle getCurrentModuleHandle() { return &__ImageBase; }
 

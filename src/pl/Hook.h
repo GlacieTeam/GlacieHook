@@ -2,8 +2,6 @@
 
 #include <set>
 
-#include "pl/internal/Macro.h"
-
 namespace pl::hook {
 
 typedef void* FuncPtr;
@@ -16,8 +14,8 @@ enum Priority : int {
     PriorityLowest  = 400,
 };
 
-PLCAPI int pl_hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, Priority priority);
+int pl_hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, Priority priority);
 
-PLCAPI bool pl_unhook(FuncPtr target, FuncPtr detour);
+bool pl_unhook(FuncPtr target, FuncPtr detour);
 
 } // namespace pl::hook

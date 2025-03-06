@@ -4,7 +4,6 @@
 #include <string_view>
 #include <vector>
 
-#include "ll/api/base/Macro.h"
 #include "ll/api/base/StdInt.h"
 #include "ll/api/memory/Memory.h"
 
@@ -140,9 +139,9 @@ intToHexStr(T value, bool upperCase = true, bool no0x = true, bool noLeadingZero
     return res;
 }
 
-LLNDAPI bool isu8str(std::string_view str) noexcept;
+bool isu8str(std::string_view str) noexcept;
 
-LLNDAPI std::string tou8str(std::string_view str);
+std::string tou8str(std::string_view str);
 
 namespace CodePage {
 enum : uint {
@@ -152,11 +151,11 @@ enum : uint {
 };
 } // namespace CodePage
 
-LLNDAPI std::wstring str2wstr(std::string_view str, uint codePage = CodePage::UTF8);
+std::wstring str2wstr(std::string_view str, uint codePage = CodePage::UTF8);
 
-LLNDAPI std::string wstr2str(std::wstring_view str, uint codePage = CodePage::UTF8);
+std::string wstr2str(std::wstring_view str, uint codePage = CodePage::UTF8);
 
-LLNDAPI std::string str2str(std::string_view str, uint fromCodePage = CodePage::ANSI, uint toCodePage = CodePage::UTF8);
+std::string str2str(std::string_view str, uint fromCodePage = CodePage::ANSI, uint toCodePage = CodePage::UTF8);
 
 [[nodiscard]] inline std::string u8str2str(std::u8string str) {
     std::string& tmp = *reinterpret_cast<std::string*>(&str);

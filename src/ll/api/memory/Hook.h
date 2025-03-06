@@ -3,7 +3,6 @@
 #include <memory>
 #include <type_traits>
 
-#include "ll/api/base/Macro.h"
 #include "ll/api/memory/Memory.h"
 
 namespace ll::memory {
@@ -45,9 +44,9 @@ enum class HookPriority : int {
     Lowest  = 400,
 };
 
-LLAPI int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority);
+int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority);
 
-LLAPI bool unhook(FuncPtr target, FuncPtr detour);
+bool unhook(FuncPtr target, FuncPtr detour);
 
 /**
  * @brief Get the pointer of a function by identifier.
@@ -55,7 +54,7 @@ LLAPI bool unhook(FuncPtr target, FuncPtr detour);
  * @param identifier signature
  * @return FuncPtr
  */
-LLNDAPI FuncPtr resolveIdentifier(char const* identifier);
+FuncPtr resolveIdentifier(char const* identifier);
 
 template <class T>
 concept FuncPtrType = std::is_function_v<std::remove_pointer_t<T>> || std::is_member_function_pointer_v<T>;
