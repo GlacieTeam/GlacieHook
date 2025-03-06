@@ -149,4 +149,4 @@ inline FuncPtr signatureCache = resolveSignature(signature);
 
 #define ADDRESS_CALL(address, Ret, ...) ((Ret(*)(__VA_ARGS__))(address))
 
-#define SIGNATURE_CALL(...) ((Ret(*)(__VA_ARGS__))(glacie::memory::signatureCache<symbol>))
+#define SIGNATURE_CALL(signature, Ret, ...) ((Ret(*)(__VA_ARGS__))(glacie::memory::signatureCache<signature>))
