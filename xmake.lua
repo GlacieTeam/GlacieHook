@@ -24,8 +24,25 @@ target("GlacieHook")
         "_AMD64_"
     )
     add_cxflags(
-        "/utf-8",
-        "/EHa"
+        "/EHa", 
+        "/utf-8", 
+        "/W4", 
+        "/w44265", 
+        "/w44289", 
+        "/w44296", 
+        "/w45263", 
+        "/w44738", 
+        "/w45204", 
+        "/O2", 
+        "/Ob3", 
+        "/GL", 
+        "/Gy", 
+        "/GF"
+    )
+    add_ldflags(
+        "/LTCG", 
+        "/OPT:REF", 
+        "/OPT:ICF"
     )
     add_files("src/**.cpp")
     add_packages(
