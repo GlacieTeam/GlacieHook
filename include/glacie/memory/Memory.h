@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstring>
 #include <functional>
 #include <memory>
 #include <string>
@@ -79,9 +80,14 @@ inline void modify(T& ref, std::function<void(std::remove_cvref_t<T>&)> const& f
     modify((void*)std::addressof(ref), sizeof(T), [&] { f((std::remove_cvref_t<T>&)(ref)); });
 }
 
-template <class RTN = void, class... Args>
-constexpr auto virtualCall(void const* self, uintptr_t off, Args&&... args) -> RTN {
-    return (*(RTN(**)(void const*, Args&&...))(*(uintptr_t*)self + off))(self, std::forward<Args>(args)...);
+template <class R = void, class... Args>
+constexpr auto addressCall(void const* address, auto&&... args) -> R {
+    return ((R(*)(Args...))address)(std::forward<decltype((args))>(args)...);
+}
+
+template <class R = void, class... Args>
+constexpr auto virtualCall(void const* self, ptrdiff_t vIndex, auto&&... args) -> R {
+    return (*(R(**)(void const*, Args...))(*(uintptr_t**)self + vIndex))(self, std::forward<decltype((args))>(args)...);
 }
 
 template <class T>
@@ -99,11 +105,11 @@ constexpr void destruct(void* ptr, ptrdiff_t off) noexcept {
     std::destroy_at(std::launder(reinterpret_cast<T*>((uintptr_t)((uintptr_t)ptr + off))));
 }
 
-template <class T, class... Types>
-constexpr auto construct(void* ptr, ptrdiff_t off, Types&&... args) {
+template <class T, class... Args>
+constexpr auto construct(void* ptr, ptrdiff_t off, Args&&... args) {
     return std::construct_at(
         std::launder(reinterpret_cast<T*>((uintptr_t)((uintptr_t)ptr + off))),
-        std::forward<Types>(args)...
+        std::forward<Args>(args)...
     );
 }
 

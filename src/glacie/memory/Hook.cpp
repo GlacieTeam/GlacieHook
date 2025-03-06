@@ -14,13 +14,9 @@ namespace glacie::memory {
 struct HookElement {
     FuncPtr  detour{};
     FuncPtr* originalFunc{};
-    int      priority{};
     int      id{};
 
-    bool operator<(const HookElement& other) const {
-        if (priority != other.priority) return priority < other.priority;
-        return id < other.id;
-    }
+    bool operator<(const HookElement& other) const { return id < other.id; }
 };
 
 struct HookData {
@@ -98,19 +94,19 @@ int processHook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc) {
     return rv;
 }
 
-[[maybe_unused]] int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority) {
+[[maybe_unused]] int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc) {
     std::lock_guard lock(getHooksMutex());
     auto            it = getHooks().find(target);
     if (it != getHooks().end()) {
         auto hookData = it->second;
-        hookData->hooks.insert({detour, originalFunc, (int)priority, hookData->incrementHookId()});
+        hookData->hooks.insert({detour, originalFunc, hookData->incrementHookId()});
         hookData->updateCallList();
         return ERROR_SUCCESS;
     }
 
     auto hookData   = new HookData{target, target, detour, nullptr, {}, {}};
     hookData->thunk = createThunk(&hookData->start);
-    hookData->hooks.insert({detour, originalFunc, (int)priority, hookData->incrementHookId()});
+    hookData->hooks.insert({detour, originalFunc, hookData->incrementHookId()});
     auto ret = processHook(target, hookData->thunk, &hookData->origin);
     if (ret) {
         delete hookData;
