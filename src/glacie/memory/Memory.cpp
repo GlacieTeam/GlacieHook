@@ -1,4 +1,4 @@
-#include "ll/api/memory/Memory.h"
+#include "glacie/memory/Memory.h"
 
 #include <cstddef>
 #include <functional>
@@ -11,32 +11,33 @@
 #include <string_view>
 #include <vector>
 
+#include "glacie/base/StdInt.h"
+#include "glacie/utils/StringUtils.h"
+#include "glacie/utils/WinUtils.h"
 #include "libhat/Process.hpp"
 #include "libhat/Scanner.hpp"
 #include "libhat/Signature.hpp"
-#include "ll/api/base/StdInt.h"
-#include "ll/api/utils/StringUtils.h"
-#include "ll/api/utils/WinUtils.h"
 
+#include "windows.h"
 #include <libhat.hpp>
 #include <winnt.h>
-#include "windows.h"
 
-using namespace ll::utils;
+using namespace glacie::utils;
 
-namespace ll::memory {
+namespace glacie::memory {
 
 FuncPtr resolveSignature(const char* signature) {
     auto module = hat::process::get_module("bedrock_server.exe");
     if (!module.has_value()) return nullptr;
     auto                                moduleData = hat::process::get_module_data(module.value());
     std::vector<hat::signature_element> elements;
-    for (std::string_view const& sv : ll::utils::string_utils::splitByPattern(signature, " ")) {
+    for (std::string_view const& sv : glacie::utils::string_utils::splitByPattern(signature, " ")) {
         if (sv.starts_with('?')) {
             elements.emplace_back();
         } else {
             elements.emplace_back((std::byte)(
-                ll::utils::string_utils::digitFromChar(sv[0]) << 4 | ll::utils::string_utils::digitFromChar(sv[1])
+                glacie::utils::string_utils::digitFromChar(sv[0]) << 4
+                | glacie::utils::string_utils::digitFromChar(sv[1])
             ));
         }
     }
@@ -61,4 +62,4 @@ Handle getModuleHandle(void* addr) {
     return hModule;
 }
 
-} // namespace ll::memory
+} // namespace glacie::memory

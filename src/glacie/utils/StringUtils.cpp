@@ -1,11 +1,11 @@
-#include "ll/api/utils/StringUtils.h"
+#include "glacie/utils/StringUtils.h"
 
 #include "magic_enum.hpp"
 
 #include "stringapiset.h"
 #include <sstream>
 
-namespace ll::utils::string_utils {
+namespace glacie::utils::string_utils {
 
 fmt::text_style getTextStyleFromCode(std::string_view code) {
     if (code.starts_with("§")) {
@@ -51,14 +51,10 @@ fmt::text_style getTextStyleFromCode(std::string_view code) {
         if (code.find(';') != std::string_view::npos) {
             bool background = code.starts_with('4');
             code.remove_prefix(1);
-            if (!code.starts_with("8;2;")) {
-                return {};
-            }
+            if (!code.starts_with("8;2;")) { return {}; }
             code.remove_prefix(4);
             auto svec = splitByPattern(code, ";");
-            if (svec.size() != 3) {
-                return {};
-            }
+            if (svec.size() != 3) { return {}; }
             auto colorFromCode = fmt::rgb(svtouc(svec[0]), svtouc(svec[1]), svtouc(svec[2]));
             if (background) {
                 return fmt::bg(colorFromCode);
@@ -111,9 +107,7 @@ std::string getAnsiCodeFromTextStyle(fmt::text_style style) {
 
 std::wstring str2wstr(std::string_view str, uint codePage) {
     int len = MultiByteToWideChar(codePage, 0, str.data(), (int)str.size(), nullptr, 0);
-    if (len == 0) {
-        return {};
-    }
+    if (len == 0) { return {}; }
     std::wstring wstr(len, L'\0');
     MultiByteToWideChar(codePage, 0, str.data(), (int)str.size(), wstr.data(), len);
     return wstr;
@@ -121,9 +115,7 @@ std::wstring str2wstr(std::string_view str, uint codePage) {
 
 std::string wstr2str(std::wstring_view str, uint codePage) {
     int len = WideCharToMultiByte(codePage, 0, str.data(), (int)str.size(), nullptr, 0, nullptr, nullptr);
-    if (len == 0) {
-        return {};
-    }
+    if (len == 0) { return {}; }
     std::string ret(len, '\0');
     WideCharToMultiByte(codePage, 0, str.data(), (int)str.size(), ret.data(), (int)ret.size(), nullptr, nullptr);
     return ret;
@@ -154,4 +146,4 @@ std::string tou8str(std::string_view str) {
     }
 }
 
-} // namespace ll::utils::string_utils
+} // namespace glacie::utils::string_utils

@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace ll {
+namespace glacie {
 template <size_t N>
 struct FixedString {
     char buf[N + 1]{};
@@ -43,4 +43,4 @@ consteval auto toFixedString() {
 
 template <size_t N>
 FixedString(char const (&)[N]) -> FixedString<N - 1>;
-} // namespace ll
+} // namespace glacie

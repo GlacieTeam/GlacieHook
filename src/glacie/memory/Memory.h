@@ -8,11 +8,11 @@
 #include <type_traits>
 #include <vector>
 
+#include "glacie/base/FixedString.h"
+#include "glacie/utils/StringUtils.h"
 #include "libhat/Signature.hpp"
-#include "ll/api/base/FixedString.h"
-#include "ll/api/utils/StringUtils.h"
 
-namespace ll::memory {
+namespace glacie::memory {
 
 using FuncPtr = void*;
 using Handle  = void*;
@@ -108,17 +108,13 @@ constexpr auto construct(void* ptr, ptrdiff_t off, Types&&... args) {
 }
 
 [[nodiscard]] inline size_t getMemSizeFromPtr(void* ptr) {
-    if (!ptr) {
-        return 0;
-    }
+    if (!ptr) { return 0; }
     return _msize(ptr);
 }
 
 template <class T, class D>
 [[nodiscard]] inline size_t getMemSizeFromPtr(std::unique_ptr<T, D>& ptr) {
-    if (!ptr) {
-        return 0;
-    }
+    if (!ptr) { return 0; }
     return _msize(ptr.get());
 }
 
@@ -127,17 +123,11 @@ template <template <class> class P, class T>
     requires(std::derived_from<P<T>, std::_Ptr_base<T>>)
 {
     auto& refc = dAccess<std::_Ref_count_base*>(std::addressof(ptr), 8);
-    if (!refc) {
-        return 0;
-    }
+    if (!refc) { return 0; }
     auto& rawptr = dAccess<T*>(std::addressof(ptr), 0);
-    if (!rawptr) {
-        return 0;
-    }
+    if (!rawptr) { return 0; }
     if constexpr (!std::is_array_v<T>) {
-        if (rawptr == dAccess<T*>(refc, 8 + 4 * 2)) {
-            return getMemSizeFromPtr(rawptr);
-        }
+        if (rawptr == dAccess<T*>(refc, 8 + 4 * 2)) { return getMemSizeFromPtr(rawptr); }
     }
     // clang-format off
     return _msize(refc // ptr* 8, rep* 8
@@ -153,10 +143,10 @@ template <template <class> class P, class T>
 template <FixedString signature>
 inline FuncPtr signatureCache = resolveSignature(signature);
 
-} // namespace ll::memory
+} // namespace glacie::memory
 
-#define LL_RESOLVE_SIGNATURE(signature) (ll::memory::signatureCache<signature>)
+#define LL_RESOLVE_SIGNATURE(signature) (glacie::memory::signatureCache<signature>)
 
 #define LL_ADDRESS_CALL(address, Ret, ...) ((Ret(*)(__VA_ARGS__))(address))
 
-#define LL_SIGNATURE_CALL(...) ((Ret(*)(__VA_ARGS__))(ll::memory::signatureCache<symbol>))
+#define LL_SIGNATURE_CALL(...) ((Ret(*)(__VA_ARGS__))(glacie::memory::signatureCache<symbol>))

@@ -1,4 +1,5 @@
-#include "pl/Hook.h"
+#include "glacie/memory/Hook.h"
+#include "glacie/memory/Memory.h"
 
 #include <iostream>
 #include <mutex>
@@ -8,7 +9,7 @@
 
 #include "detours/detours.h"
 
-namespace pl::hook {
+namespace glacie::memory {
 
 struct HookElement {
     FuncPtr  detour{};
@@ -59,7 +60,7 @@ std::unordered_map<FuncPtr, std::shared_ptr<HookData>>& getHooks() {
     static std::unordered_map<FuncPtr, std::shared_ptr<HookData>> hooks;
     return hooks;
 }
-std::mutex& getHooksMutex(){
+std::mutex& getHooksMutex() {
     static std::mutex hooksMutex;
     return hooksMutex;
 }
@@ -97,40 +98,30 @@ int processHook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc) {
     return rv;
 }
 
-[[maybe_unused]] int pl_hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, Priority priority) {
-    std::cout << 1 << std::endl;
+[[maybe_unused]] int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority) {
     std::lock_guard lock(getHooksMutex());
-    std::cout << 2 << std::endl;
     auto            it = getHooks().find(target);
-    std::cout << 3 << std::endl;
     if (it != getHooks().end()) {
         auto hookData = it->second;
-        hookData->hooks.insert({detour, originalFunc, priority, hookData->incrementHookId()});
+        hookData->hooks.insert({detour, originalFunc, (int)priority, hookData->incrementHookId()});
         hookData->updateCallList();
         return ERROR_SUCCESS;
     }
-    std::cout << 4 << std::endl;
-    
+
     auto hookData   = new HookData{target, target, detour, nullptr, {}, {}};
-    std::cout << 5 << std::endl;
     hookData->thunk = createThunk(&hookData->start);
-    std::cout << 6 << std::endl;
-    hookData->hooks.insert({detour, originalFunc, priority, hookData->incrementHookId()});
-    std::cout << 7 << std::endl;
+    hookData->hooks.insert({detour, originalFunc, (int)priority, hookData->incrementHookId()});
     auto ret = processHook(target, hookData->thunk, &hookData->origin);
-    std::cout << 8 << std::endl;
     if (ret) {
         delete hookData;
         return ret;
     }
-    std::cout << 9 << std::endl;
     hookData->updateCallList();
     getHooks().emplace(target, std::shared_ptr<HookData>(hookData));
-    std::cout << 10 << std::endl;
     return ERROR_SUCCESS;
 }
 
-[[maybe_unused]] bool pl_unhook(FuncPtr target, FuncPtr detour) {
+[[maybe_unused]] bool unhook(FuncPtr target, FuncPtr detour) {
     std::lock_guard lock(getHooksMutex());
     auto            hookDataIter = getHooks().find(target);
     if (hookDataIter == getHooks().end()) { return false; }
@@ -144,4 +135,6 @@ int processHook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc) {
     return false;
 }
 
-} // namespace pl::hook
+FuncPtr resolveIdentifier(char const* identifier) { return resolveSignature(identifier); }
+
+} // namespace glacie::memory

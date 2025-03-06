@@ -4,13 +4,13 @@
 #include <string_view>
 #include <vector>
 
-#include "ll/api/base/StdInt.h"
-#include "ll/api/memory/Memory.h"
+#include "glacie/base/StdInt.h"
+#include "glacie/memory/Memory.h"
 
 #include "fmt/color.h"
 #include "fmt/core.h"
 
-namespace ll::utils::string_utils {
+namespace glacie::utils::string_utils {
 
 // "2021-03-24"  ->  ["2021", "03", "24"]  (use '-' as split pattern)
 [[nodiscard]] constexpr std::vector<std::string_view>
@@ -189,15 +189,9 @@ template <class T, auto f>
     char*       eptr;
     errnoRef       = 0;
     const auto ans = f(ptr, &eptr, base);
-    if (ptr == eptr) {
-        throw std::invalid_argument("invalid svtonum argument");
-    }
-    if (errnoRef == ERANGE) {
-        throw std::out_of_range("svtonum argument out of range");
-    }
-    if (idx) {
-        *idx = static_cast<size_t>(eptr - ptr);
-    }
+    if (ptr == eptr) { throw std::invalid_argument("invalid svtonum argument"); }
+    if (errnoRef == ERANGE) { throw std::out_of_range("svtonum argument out of range"); }
+    if (idx) { *idx = static_cast<size_t>(eptr - ptr); }
     return static_cast<T>(ans);
 }
 template <class T, auto f>
@@ -207,15 +201,9 @@ template <class T, auto f>
     char*       eptr;
     errnoRef       = 0;
     const auto ans = f(ptr, &eptr);
-    if (ptr == eptr) {
-        throw std::invalid_argument("invalid svtonum argument");
-    }
-    if (errnoRef == ERANGE) {
-        throw std::out_of_range("svtonum argument out of range");
-    }
-    if (idx) {
-        *idx = static_cast<size_t>(eptr - ptr);
-    }
+    if (ptr == eptr) { throw std::invalid_argument("invalid svtonum argument"); }
+    if (errnoRef == ERANGE) { throw std::out_of_range("svtonum argument out of range"); }
+    if (idx) { *idx = static_cast<size_t>(eptr - ptr); }
     return static_cast<T>(ans);
 }
 
@@ -258,4 +246,4 @@ template <class T, auto f>
 [[nodiscard]] inline ldouble svtold(std::string_view str, size_t* idx = nullptr) {
     return svtonum<ldouble, strtof>(str, idx);
 }
-} // namespace ll::utils::string_utils
+} // namespace glacie::utils::string_utils

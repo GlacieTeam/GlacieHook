@@ -1,15 +1,15 @@
-#include "ll/api/utils/WinUtils.h"
+#include "glacie/utils/WinUtils.h"
 
 #include <string>
 
-#include "ll/api/utils/StringUtils.h"
+#include "glacie/utils/StringUtils.h"
 
 #include "windows.h"
 
 #include "psapi.h"
 
-using namespace ll::utils::string_utils;
-namespace ll::utils::win_utils {
+using namespace glacie::utils::string_utils;
+namespace glacie::utils::win_utils {
 
 std::string getSystemLocaleName() {
     wchar_t buf[LOCALE_NAME_MAX_LENGTH]{};
@@ -47,4 +47,4 @@ std::span<uchar> getImageRange(std::string const& name) {
     return {};
 }
 
-} // namespace ll::utils::win_utils
+} // namespace glacie::utils::win_utils

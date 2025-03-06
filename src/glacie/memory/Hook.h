@@ -1,11 +1,30 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <type_traits>
 
-#include "ll/api/memory/Memory.h"
+#include "glacie/memory/Memory.h"
 
-namespace ll::memory {
+namespace glacie::memory {
+
+typedef void* FuncPtr;
+
+/**
+ * @brief Hook priority enum.
+ * @details The higher priority, the hook will be executed earlier
+ */
+enum class HookPriority : int {
+    Highest = 0,
+    High    = 100,
+    Normal  = 200,
+    Low     = 300,
+    Lowest  = 400,
+};
+
+int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority);
+
+bool unhook(FuncPtr target, FuncPtr detour);
 
 template <class T>
 struct IsConstMemberFun : std::false_type {};
@@ -31,18 +50,6 @@ using AddConstAtMemberFunT = typename AddConstAtMemberFun<T>::type;
 
 template <class T, class U>
 using AddConstAtMemberFunIfOriginIs = std::conditional_t<IsConstMemberFunV<U>, AddConstAtMemberFunT<T>, T>;
-
-/**
- * @brief Hook priority enum.
- * @details The higher priority, the hook will be executed earlier
- */
-enum class HookPriority : int {
-    Highest = 0,
-    High    = 100,
-    Normal  = 200,
-    Low     = 300,
-    Lowest  = 400,
-};
 
 int hook(FuncPtr target, FuncPtr detour, FuncPtr* originalFunc, HookPriority priority);
 
@@ -85,14 +92,14 @@ struct HookAutoRegister {
     static bool unhook() { return T::unhook(); }
 };
 
-} // namespace ll::memory
+} // namespace glacie::memory
 
 #define LL_HOOK_IMPL(REGISTER, FUNC_PTR, STATIC, CALL, DEF_TYPE, TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)            \
     struct DEF_TYPE TYPE {                                                                                             \
-        using FuncPtr      = ::ll::memory::FuncPtr;                                                                    \
-        using HookPriority = ::ll::memory::HookPriority;                                                               \
+        using FuncPtr      = ::glacie::memory::FuncPtr;                                                                \
+        using HookPriority = ::glacie::memory::HookPriority;                                                           \
         using OriginFuncType =                                                                                         \
-            ::ll::memory::AddConstAtMemberFunIfOriginIs<RET_TYPE FUNC_PTR(__VA_ARGS__), decltype(IDENTIFIER)>;         \
+            ::glacie::memory::AddConstAtMemberFunIfOriginIs<RET_TYPE FUNC_PTR(__VA_ARGS__), decltype(IDENTIFIER)>;     \
                                                                                                                        \
         inline static FuncPtr        target{};                                                                         \
         inline static OriginFuncType originFunc{};                                                                     \
@@ -105,24 +112,24 @@ struct HookAutoRegister {
         STATIC RET_TYPE detour(__VA_ARGS__);                                                                           \
                                                                                                                        \
         static int hook() {                                                                                            \
-            target = ll::memory::resolveIdentifier<OriginFuncType>(IDENTIFIER);                                        \
+            target = glacie::memory::resolveIdentifier<OriginFuncType>(IDENTIFIER);                                    \
             if (target == nullptr) { return -1; }                                                                      \
-            return ll::memory::hook(                                                                                   \
+            return glacie::memory::hook(                                                                               \
                 target,                                                                                                \
-                ll::memory::toFuncPtr(&DEF_TYPE::detour),                                                              \
+                glacie::memory::toFuncPtr(&DEF_TYPE::detour),                                                          \
                 reinterpret_cast<FuncPtr*>(&originFunc),                                                               \
                 PRIORITY                                                                                               \
             );                                                                                                         \
         }                                                                                                              \
                                                                                                                        \
-        static bool unhook() { return ll::memory::unhook(target, ll::memory::toFuncPtr(&DEF_TYPE::detour)); }          \
+        static bool unhook() { return glacie::memory::unhook(target, glacie::memory::toFuncPtr(&DEF_TYPE::detour)); }  \
     };                                                                                                                 \
     REGISTER;                                                                                                          \
     RET_TYPE DEF_TYPE::detour(__VA_ARGS__)
 
 #define LL_AUTO_REG_HOOK_IMPL(FUNC_PTR, STATIC, CALL, DEF_TYPE, ...)                                                   \
     LL_VA_EXPAND(LL_HOOK_IMPL(                                                                                         \
-        inline ll::memory::HookAutoRegister<DEF_TYPE> DEF_TYPE##AutoRegister,                                          \
+        inline glacie::memory::HookAutoRegister<DEF_TYPE> DEF_TYPE##AutoRegister,                                      \
         FUNC_PTR,                                                                                                      \
         STATIC,                                                                                                        \
         CALL,                                                                                                          \
@@ -145,7 +152,7 @@ struct HookAutoRegister {
 /**
  * @brief Register a hook for a typed static function.
  * @param DEF_TYPE The name of the hook definition.
- * @param PRIORITY ll::memory::HookPriority The priority of the hook.
+ * @param PRIORITY glacie::memory::HookPriority The priority of the hook.
  * @param TYPE The type which the function belongs to.
  * @param IDENTIFIER The identifier of the hook. It can be a function pointer, symbol, address or a signature.
  * @param RET_TYPE The return type of the hook.
@@ -159,7 +166,7 @@ struct HookAutoRegister {
 /**
  * @brief Register a hook for a static function.
  * @param DEF_TYPE The name of the hook definition.
- * @param PRIORITY ll::memory::HookPriority The priority of the hook.
+ * @param PRIORITY glacie::memory::HookPriority The priority of the hook.
  * @param IDENTIFIER The identifier of the hook. It can be a function pointer, symbol, address or a signature.
  * @param RET_TYPE The return type of the hook.
  * @param ... The parameters of the hook.
@@ -188,7 +195,7 @@ struct HookAutoRegister {
 /**
  * @brief Register a hook for a typed instance function.
  * @param DEF_TYPE The name of the hook definition.
- * @param PRIORITY ll::memory::HookPriority The priority of the hook.
+ * @param PRIORITY glacie::memory::HookPriority The priority of the hook.
  * @param TYPE The type which the function belongs to.
  * @param IDENTIFIER The identifier of the hook. It can be a function pointer, symbol, address or a signature.
  * @param RET_TYPE The return type of the hook.
@@ -202,7 +209,7 @@ struct HookAutoRegister {
 /**
  * @brief Register a hook for a instance function.
  * @param DEF_TYPE The name of the hook definition.
- * @param PRIORITY ll::memory::HookPriority The priority of the hook.
+ * @param PRIORITY glacie::memory::HookPriority The priority of the hook.
  * @param IDENTIFIER The identifier of the hook. It can be a function pointer, symbol, address or a signature.
  * @param RET_TYPE The return type of the hook.
  * @param ... The parameters of the hook.
