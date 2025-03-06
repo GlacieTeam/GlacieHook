@@ -145,8 +145,8 @@ inline FuncPtr signatureCache = resolveSignature(signature);
 
 } // namespace glacie::memory
 
-#define LL_RESOLVE_SIGNATURE(signature) (glacie::memory::signatureCache<signature>)
+#define RESOLVE_SIGNATURE(signature) (glacie::memory::signatureCache<signature>)
 
-#define LL_ADDRESS_CALL(address, Ret, ...) ((Ret(*)(__VA_ARGS__))(address))
+#define ADDRESS_CALL(address, Ret, ...) ((Ret(*)(__VA_ARGS__))(address))
 
-#define LL_SIGNATURE_CALL(...) ((Ret(*)(__VA_ARGS__))(glacie::memory::signatureCache<symbol>))
+#define SIGNATURE_CALL(...) ((Ret(*)(__VA_ARGS__))(glacie::memory::signatureCache<symbol>))

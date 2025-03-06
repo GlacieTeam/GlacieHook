@@ -16,8 +16,7 @@ target("GlacieHook")
     set_languages("cxx20")
     set_symbols("debug")   
     set_exceptions("none")
-    add_includedirs("src")
-    add_headerfiles("src/**.h")
+    add_includedirs("include")
     add_defines(
         "NOMINMAX", 
         "UNICODE",

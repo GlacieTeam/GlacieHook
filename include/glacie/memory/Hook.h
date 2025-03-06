@@ -94,7 +94,7 @@ struct HookAutoRegister {
 
 } // namespace glacie::memory
 
-#define LL_HOOK_IMPL(REGISTER, FUNC_PTR, STATIC, CALL, DEF_TYPE, TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)            \
+#define HOOK_IMPL(REGISTER, FUNC_PTR, STATIC, CALL, DEF_TYPE, TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)               \
     struct DEF_TYPE TYPE {                                                                                             \
         using FuncPtr      = ::glacie::memory::FuncPtr;                                                                \
         using HookPriority = ::glacie::memory::HookPriority;                                                           \
@@ -127,8 +127,8 @@ struct HookAutoRegister {
     REGISTER;                                                                                                          \
     RET_TYPE DEF_TYPE::detour(__VA_ARGS__)
 
-#define LL_AUTO_REG_HOOK_IMPL(FUNC_PTR, STATIC, CALL, DEF_TYPE, ...)                                                   \
-    LL_VA_EXPAND(LL_HOOK_IMPL(                                                                                         \
+#define AUTO_REG_HOOK_IMPL(FUNC_PTR, STATIC, CALL, DEF_TYPE, ...)                                                      \
+    VA_EXPAND(HOOK_IMPL(                                                                                               \
         inline glacie::memory::HookAutoRegister<DEF_TYPE> DEF_TYPE##AutoRegister,                                      \
         FUNC_PTR,                                                                                                      \
         STATIC,                                                                                                        \
@@ -137,17 +137,17 @@ struct HookAutoRegister {
         __VA_ARGS__                                                                                                    \
     ))
 
-#define LL_MANUAL_REG_HOOK_IMPL(...) LL_VA_EXPAND(LL_HOOK_IMPL(, __VA_ARGS__))
+#define MANUAL_REG_HOOK_IMPL(...) VA_EXPAND(HOOK_IMPL(, __VA_ARGS__))
 
-#define LL_STATIC_HOOK_IMPL(...) LL_VA_EXPAND(LL_MANUAL_REG_HOOK_IMPL((*), static, originFunc, __VA_ARGS__))
+#define STATIC_HOOK_IMPL(...) VA_EXPAND(MANUAL_REG_HOOK_IMPL((*), static, originFunc, __VA_ARGS__))
 
-#define LL_AUTO_STATIC_HOOK_IMPL(...) LL_VA_EXPAND(LL_AUTO_REG_HOOK_IMPL((*), static, originFunc, __VA_ARGS__))
+#define AUTO_STATIC_HOOK_IMPL(...) VA_EXPAND(AUTO_REG_HOOK_IMPL((*), static, originFunc, __VA_ARGS__))
 
-#define LL_INSTANCE_HOOK_IMPL(DEF_TYPE, ...)                                                                           \
-    LL_VA_EXPAND(LL_MANUAL_REG_HOOK_IMPL((DEF_TYPE::*), , (this->*originFunc), DEF_TYPE, __VA_ARGS__))
+#define INSTANCE_HOOK_IMPL(DEF_TYPE, ...)                                                                              \
+    VA_EXPAND(MANUAL_REG_HOOK_IMPL((DEF_TYPE::*), , (this->*originFunc), DEF_TYPE, __VA_ARGS__))
 
-#define LL_AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, ...)                                                                      \
-    LL_VA_EXPAND(LL_AUTO_REG_HOOK_IMPL((DEF_TYPE::*), , (this->*originFunc), DEF_TYPE, __VA_ARGS__))
+#define AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, ...)                                                                         \
+    VA_EXPAND(AUTO_REG_HOOK_IMPL((DEF_TYPE::*), , (this->*originFunc), DEF_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a typed static function.
@@ -160,8 +160,8 @@ struct HookAutoRegister {
  *
  * @note register or unregister by calling DEF_TYPE::hook() and DEF_TYPE::unhook().
  */
-#define LL_TYPE_STATIC_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                       \
-    LL_VA_EXPAND(LL_STATIC_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define TYPE_STATIC_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                          \
+    VA_EXPAND(STATIC_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a static function.
@@ -173,24 +173,24 @@ struct HookAutoRegister {
  *
  * @note register or unregister by calling DEF_TYPE::hook() and DEF_TYPE::unhook().
  */
-#define LL_STATIC_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                                  \
-    LL_VA_EXPAND(LL_STATIC_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define STATIC_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                                     \
+    VA_EXPAND(STATIC_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a typed static function.
  * @details The hook will be automatically registered and unregistered.
- * @see LL_TYPE_STATIC_HOOK for usage.
+ * @see TYPE_STATIC_HOOK for usage.
  */
-#define LL_AUTO_TYPE_STATIC_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                  \
-    LL_VA_EXPAND(LL_AUTO_STATIC_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define AUTO_TYPE_STATIC_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                     \
+    VA_EXPAND(AUTO_STATIC_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a static function.
  * @details The hook will be automatically registered and unregistered.
- * @see LL_STATIC_HOOK for usage.
+ * @see STATIC_HOOK for usage.
  */
-#define LL_AUTO_STATIC_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                             \
-    LL_VA_EXPAND(LL_AUTO_STATIC_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define AUTO_STATIC_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                                \
+    VA_EXPAND(AUTO_STATIC_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a typed instance function.
@@ -203,8 +203,8 @@ struct HookAutoRegister {
  *
  * @note register or unregister by calling DEF_TYPE::hook() and DEF_TYPE::unhook().
  */
-#define LL_TYPE_INSTANCE_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                     \
-    LL_VA_EXPAND(LL_INSTANCE_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define TYPE_INSTANCE_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                        \
+    VA_EXPAND(INSTANCE_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a instance function.
@@ -216,21 +216,21 @@ struct HookAutoRegister {
  *
  * @note register or unregister by calling DEF_TYPE::hook() and DEF_TYPE::unhook().
  */
-#define LL_INSTANCE_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                                \
-    LL_VA_EXPAND(LL_INSTANCE_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define INSTANCE_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                                   \
+    VA_EXPAND(INSTANCE_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a typed instance function.
  * @details The hook will be automatically registered and unregistered.
- * @see LL_TYPE_INSTANCE_HOOK for usage.
+ * @see TYPE_INSTANCE_HOOK for usage.
  */
-#define LL_AUTO_TYPE_INSTANCE_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                \
-    LL_VA_EXPAND(LL_AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define AUTO_TYPE_INSTANCE_HOOK(DEF_TYPE, PRIORITY, TYPE, IDENTIFIER, RET_TYPE, ...)                                   \
+    VA_EXPAND(AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, : public TYPE, PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
 
 /**
  * @brief Register a hook for a instance function.
  * @details The hook will be automatically registered and unregistered.
- * @see LL_INSTANCE_HOOK for usage.
+ * @see INSTANCE_HOOK for usage.
  */
-#define LL_AUTO_INSTANCE_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                           \
-    LL_VA_EXPAND(LL_AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
+#define AUTO_INSTANCE_HOOK(DEF_TYPE, PRIORITY, IDENTIFIER, RET_TYPE, ...)                                              \
+    VA_EXPAND(AUTO_INSTANCE_HOOK_IMPL(DEF_TYPE, , PRIORITY, IDENTIFIER, RET_TYPE, __VA_ARGS__))
