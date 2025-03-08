@@ -1,5 +1,5 @@
 # GlacieHook
-Hook library for Glacie
+`GlacieHook` is a hook library used in Glacie.
 
 ## Used Projects
 | Project          | License    | Link                                     |
