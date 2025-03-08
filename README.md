@@ -1,5 +1,5 @@
 # GlacieHook
-`GlacieHook` is a hook library used in Glacie.
+`GlacieHook` is a hook library used in Glacie for Endstone.
 
 ## Used Projects
 | Project          | License    | Link                                     |
